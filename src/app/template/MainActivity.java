@@ -29,7 +29,7 @@ public class MainActivity extends Activity {
 						http.setRequestMethod("POST");
 						http.setDoOutput(true);
 						http.setRequestProperty("Cookie", miden);
-						String post = "users=Dirty0wolf%40gmail.com&parole=Bonch910";
+						String post = "users=XXX&parole=XXX";
 						OutputStream os = http.getOutputStream();
 						os.write(post.getBytes());
 						os.close();
