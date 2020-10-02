@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="app_name">BonchCheck</string>
+	<string name="login_pc">Вход в личный кабинет</string>
+</resources>

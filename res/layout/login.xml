@@ -52,7 +52,7 @@
 			android:layout_height="wrap_content"
 			android:text="Войти"
 			android:layout_gravity="right"
-			android:background="#FBB834"
+			android:background="@color/bonch"
 			android:typeface="monospace"
 			android:id="@+id/login_butt"/>
 
