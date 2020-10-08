@@ -19,86 +19,60 @@ public class MainActivity extends Activity {
 	final int MENU_EXIT = 22;
 
 	SharedPreferences prefs;
-	String miden;
-	String users;
-	String parole;
-	StringBuilder sb;
+	String sid;
+	String user;
+	String pass;
+	String sb;
 
 	@Override protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		prefs = getSharedPreferences("data", MODE_PRIVATE);
-		miden = prefs.getString("miden", "null");
-		users = prefs.getString("users", "null");
-		parole = prefs.getString("parole", "null");
-		if (!prefs.contains("miden") || !prefs.contains("users") || !prefs.contains("parole"))
+		user = prefs.getString("user", null);
+		pass = prefs.getString("pass", null);
+		if (user == null || pass == null)
 			startActivityForResult(new Intent(this, LoginActivity.class), 20);
 		final Button butt = new Button(this);
-		butt.setBackgroundColor(0xffffb834);
-		butt.setText("Отметиться на паре");
+		butt.setBackgroundColor(getResources().getColor(R.color.bonch));
+		butt.setText(R.string.check);
+		butt.setPadding(16, 64, 16, 64);
 		butt.setOnClickListener(new OnClickListener() {
 				@Override public void onClick(View p0) {
-					if (butt.isEnabled()) {
-						butt.setEnabled(false);
-						new Thread(new Runnable() {
-								@Override public void run() {
-									try {
-										HttpURLConnection http = (HttpURLConnection)new URL("https://lk.sut.ru/lib/autentificationok.php").openConnection();
-										http.setRequestMethod("POST");
-										http.setDoOutput(true);
-										http.setRequestProperty("Cookie", miden);
-										String post = new StringBuilder().append("users=").append(users).append("&parole=").append(parole).toString();
-										OutputStream os = http.getOutputStream();
-										os.write(post.getBytes());
-										os.close();
-										http.connect();
-										http.getInputStream().read();
-										http.disconnect();
-
-										http = (HttpURLConnection)new URL("https://lk.sut.ru/project/cabinet/forms/raspisanie.php").openConnection();
-										http.setRequestMethod("POST");
-										http.setDoOutput(true);
-										http.setRequestProperty("Cookie", miden);
-										post = new StringBuilder().append("open=1&rasp=").append("").append("&week=").append("").toString();
-										os = http.getOutputStream();
-										//os.write(post.getBytes());
-										os.close();
-										http.connect();
-										InputStream is = http.getInputStream();
-										BufferedReader br = new BufferedReader(new InputStreamReader(is, "Windows-1251"));
-										sb = new StringBuilder();
-										String str;
-										while ((str = br.readLine()) != null)
-											sb.append(str);
-										br.close();
-										is.close();
-										http.disconnect();
-									} catch (IOException e) {}
-									runOnUiThread(new Runnable() {
-											@Override
-											public void run() {
-												Toast.makeText(MainActivity.this, sb.toString(), 1).show();
-												butt.setEnabled(true);
-											}
-										});
-								}
-							}).start();
-					} else
-						Toast.makeText(MainActivity.this, "Хватит нажимать", 0).show();
+					butt.setEnabled(false);
+					new Thread(new Runnable() {
+							@Override public void run() {
+								sid = BonchAPI.login(user, pass);
+								sb = BonchAPI.getResponse(sid, Endpoint.rasp);
+								int indexFOpen = sb.indexOf("open_zan(raspisanie");
+								int indexOpen = sb.indexOf("open_zan");
+								if (indexOpen != indexFOpen) {
+									String rasp = sb.substring(indexOpen + 9, sb.indexOf(',', indexOpen));
+									String week = sb.substring(sb.indexOf(',', indexOpen) + 2, sb.indexOf(')', indexOpen));
+									sb = BonchAPI.postResponse(sid, Endpoint.rasp, new StringBuilder().append("open=1&rasp=").append(rasp).append("&week=").append(week).toString());
+								} else
+									sb = getString(R.string.no_check);
+								runOnUiThread(new Runnable() {
+										@Override public void run() {
+											Toast.makeText(MainActivity.this, sb, 0).show();
+											butt.setEnabled(true);
+										}
+									});
+							}
+						}).start();
 				}
 			});
-			LinearLayout ll = new LinearLayout(this);
-			ll.setGravity(Gravity.CENTER);
-			ll.addView(butt);
-			setContentView(ll);
+		LinearLayout ll = new LinearLayout(this);
+		ll.setGravity(Gravity.CENTER);
+		ll.addView(butt);
+		setContentView(ll);
 	}
 
 	@Override public boolean onCreateOptionsMenu(Menu menu) {
-		menu.add(0, MENU_PROFILE, 0, "Мой профиль");
-		menu.add(0, MENU_LOGIN, 0, "Залогиниться");
-		menu.add(0, MENU_BONCHNET, 0, "Войти в БончНет (BonchNet)");
-		menu.add(0, MENU_PRIVACY, 0, "Политика конфиденциальности");
-		menu.add(0, MENU_LICENSE, 0, "Лицензия");
-		menu.add(0, MENU_EXIT, 0, "Выйти");
+		menu.add(0, MENU_PROFILE, 0, R.string.profile);
+		menu.add(0, MENU_LOGIN, 0, R.string.login_pc);
+		//menu.add(0, MENU_BONCHNET, 0, "Войти в БончНет (BonchNet)");
+		menu.add(0, MENU_PRIVACY, 0, R.string.conf);
+		menu.add(0, MENU_LICENSE, 0, R.string.license);
+		menu.add(0, MENU_EXIT, 0, R.string.exit);
 		return super.onCreateOptionsMenu(menu);
 	}
 
@@ -112,41 +86,12 @@ public class MainActivity extends Activity {
 				break;
 			case MENU_BONCHNET:
 				item.setEnabled(false);
-				new Thread(new Runnable() {
-						@Override public void run() {
-							try {
-								HttpURLConnection http = (HttpURLConnection)new URL("https://wifi.itut.ru:8003/index.php?zone=cpzone").openConnection();
-								http.setRequestMethod("POST");
-								http.setDoOutput(true);
-								String post = "redirurl=&auth_user=kuznecov.ik&auth_pass=Bonch910";
-								OutputStream os = http.getOutputStream();
-								os.write(post.getBytes());
-								os.close();
-								http.connect();
-								InputStream is = http.getInputStream();
-								BufferedReader br = new BufferedReader(new InputStreamReader(is));
-								String str;
-								while ((str = br.readLine()) != null)
-									sb.append(str);
-								br.close();
-								is.close();
-								http.disconnect();
-							} catch (IOException e) {}
-							runOnUiThread(new Runnable() {
-									@Override
-									public void run() {
-										Toast.makeText(MainActivity.this, "Добро пожаловать в БончНет, самую андеграунд сеть района", 0).show();
-										item.setEnabled(false);
-									}
-								});
-						}
-					}).start();
 				break;
 			case MENU_PRIVACY:
-				new AlertDialog.Builder(this).setTitle("Политика конфиденциальности").setMessage("Твои личные данный в безопасности, потому что всем пофиг на них, как и на тебя").setPositiveButton("Согласен", null).show();
+				new AlertDialog.Builder(this).setTitle(R.string.conf).setMessage(R.string.conf_text).setPositiveButton("Согласен", null).show();
 				break;
 			case MENU_LICENSE:
-				new AlertDialog.Builder(this).setTitle("Лицензия").setMessage("DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE\nVersion 2, December 2004\n\nCopyright (C) 2004 Sam Hocevar <sam@hocevar.net>\n\nEveryone is permitted to copy and distribute verbatim or modified\ncopies of this license document, and changing it is allowed as long\nas the name is changed.\n\nDO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE\nTERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION\n\n0. You just DO WHAT THE FUCK YOU WANT TO.").setPositiveButton(":3", null).show();
+				new AlertDialog.Builder(this).setTitle(R.string.license).setMessage(R.string.license_text).setPositiveButton(":3", null).show();
 				break;
 			case MENU_EXIT:
 				finish();
@@ -159,10 +104,9 @@ public class MainActivity extends Activity {
 		if (resultCode == RESULT_OK)
 			switch (requestCode) {
 				case 20:
-					miden = data.getStringExtra("miden");
-					users = data.getStringExtra("users");
-					parole = data.getStringExtra("parole");
-					prefs.edit().putString("miden", miden).putString("users", users).putString("parole", parole).putString("wifi", data.getStringExtra("wifi")).commit();
+					user = data.getStringExtra("user");
+					pass = data.getStringExtra("pass");
+					prefs.edit().putString("user", user).putString("pass", pass).putString("wifi", data.getStringExtra("wifi")).commit();
 					break;
 			} else finish();
 	}

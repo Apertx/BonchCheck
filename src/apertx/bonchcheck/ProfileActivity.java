@@ -4,35 +4,31 @@ import android.os.*;
 import java.io.*;
 import java.net.*;
 import android.widget.*;
+import android.content.*;
 
 public class ProfileActivity extends Activity {
-	StringBuilder sb;
+	String sid;
+	String user;
+	String pass;
+	String sb;
 	String[] stats;
 
 	@Override
 	protected void onCreate(Bundle b0) {
 		super.onCreate(b0);
+		SharedPreferences prefs = getSharedPreferences("data", MODE_PRIVATE);
+		user = prefs.getString("user", null);
+		pass = prefs.getString("pass", null);
 		final ListView list = new ListView(this);
 		setContentView(list);
 		new Thread(new Runnable() {
 				@Override
 				public void run() {
-					try {
-						HttpURLConnection http = (HttpURLConnection)new URL("https://lk.sut.ru/project/cabinet/forms/wifi.php").openConnection();
-						http.setRequestProperty("Cookie", getSharedPreferences("data", MODE_PRIVATE).getString("miden", ""));
-						http.connect();
-						InputStream is = http.getInputStream();
-						BufferedReader br = new BufferedReader(new InputStreamReader(is, "Windows-1251"));
-						sb = new StringBuilder();
-						String str;
-						while ((str = br.readLine()) != null)
-							sb.append(str);
-						br.close();
-						is.close();
-						http.disconnect();
-					} catch (IOException e) {}
-					String str = sb.toString();
-					stats = str.split("<th>");
+					sid = BonchAPI.login(user, pass);
+					sb = BonchAPI.getResponse(sid, Endpoint.profile);
+					stats = sb.substring(sb.indexOf("<th>") + 4).split("<th>");
+					for (int i = 0; i < stats.length; i += 1)
+						stats[i] = stats[i].replace("</th><td>", " ").substring(0, stats[i].indexOf("</td") - 8);
 					list.post(new Runnable() {
 							@Override
 							public void run() {

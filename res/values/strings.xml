@@ -2,4 +2,18 @@
 <resources>
 	<string name="app_name">BonchCheck</string>
 	<string name="login_pc">Вход в личный кабинет</string>
+	<string name="profile">Мой профиль</string>
+	<string name="exit">Выйти</string>
+	<string name="signin">Войти</string>
+	<string name="login">Логин</string>
+	<string name="email">E-mail</string>
+	<string name="pass">Пароль</string>
+	<string name="auth_err">Не удалось войти</string>
+	<string name="license">Лицензия</string>
+	<string name="license_text">DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE\nVersion 2, December 2004\n\nCopyright (C) 2004 Sam Hocevar sam@hocevar.net\n\nEveryone is permitted to copy and distribute verbatim or modified\ncopies of this license document, and changing it is allowed as long\nas the name is changed.\n\nDO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE\nTERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION\n\n0. You just DO WHAT THE FUCK YOU WANT TO.</string>
+	<string name="conf">Политика конфиденциальности</string>
+	<string name="conf_text">Приложение BonchCheck не собирает никаких данных о пользователе и никак их не обрабатывает.\n\nВсе данные хранятся в приватном пространстве приложения в незашифрованном виде.</string>
+	<string name="check">Отметиться на паре</string>
+	<string name="no_check">Сейчас негде отметиться</string>
+	<string name="error">Ошибка</string>
 </resources>

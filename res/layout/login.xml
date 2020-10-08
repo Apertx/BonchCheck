@@ -10,7 +10,7 @@
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:padding="8dp"
-		android:background="#F3F3F3">
+		android:background="@color/background">
 
 		<TextView
 			android:layout_width="wrap_content"
@@ -32,7 +32,7 @@
 		<TextView
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:text="Пароль"
+			android:text="@string/pass"
 			android:typeface="monospace"/>
 
 		<EditText
@@ -50,7 +50,7 @@
 		<Button
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:text="Войти"
+			android:text="@string/signin"
 			android:layout_gravity="right"
 			android:background="@color/bonch"
 			android:typeface="monospace"
